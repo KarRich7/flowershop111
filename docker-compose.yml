@@ -1,0 +1,175 @@
+# «Цветы Урала» — тестовый стенд.
+#   cp .env.example .env && docker compose up -d --build
+# Сайт: http://localhost:3000   Админка: http://localhost:3000/admin
+# API:  http://localhost:8000/api/docs/   Django admin: http://localhost:8000/django-admin/
+# Боевой запуск с доменом и HTTPS: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#   (подробно — docs/DEPLOY.md)
+#
+# Порты по умолчанию открыты только на этом компьютере (127.0.0.1). Чтобы открыть сайт с телефона
+# в той же Wi-Fi сети, в .env: SITE_BIND=0.0.0.0 и зайдите на http://<IP компьютера>:3000
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "5" }  # журналы не займут весь диск
+
+x-backend: &backend
+  build: ./backend
+  image: cvety-urala-backend:latest
+  env_file: .env
+  logging: *logging
+  security_opt: ["no-new-privileges:true"]
+  environment:
+    POSTGRES_HOST: db
+    POSTGRES_PORT: "5432"
+    REDIS_URL: redis://redis:6379/0
+    MEDIA_ROOT: /app/media
+  volumes:
+    - media:/app/media
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_healthy }
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    logging: *logging
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-flowers}
+      POSTGRES_USER: ${POSTGRES_USER:-flowers}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-flowers}
+      TZ: Asia/Yekaterinburg  # пермское время (UTC+5)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-flowers} -d ${POSTGRES_DB:-flowers}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    logging: *logging
+    security_opt: ["no-new-privileges:true"]
+    # память ограничена: при переполнении вытесняются ключи со сроком жизни (кэш, лимиты), а не очередь задач
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "volatile-lru"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    <<: *backend
+    command: ["web"]
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"  # API снаружи не открываем: сайт ходит к нему по внутренней сети
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  celery-worker:
+    <<: *backend
+    command: ["worker"]
+    restart: unless-stopped
+
+  celery-beat:
+    <<: *backend
+    command: ["beat"]
+    restart: unless-stopped
+
+  # Без TELEGRAM_BOT_TOKEN контейнер пишет предупреждение и завершается (код 0);
+  # на сайте при этом нет кнопок «Войти через Telegram» и уведомлений в Telegram
+  telegram-bot:
+    <<: *backend
+    command: ["telegram"]
+    restart: on-failure
+    depends_on:
+      backend: { condition: service_healthy }
+
+  # Без VK_GROUP_TOKEN и VK_GROUP_ID — аналогично
+  vk-bot:
+    <<: *backend
+    command: ["vk"]
+    restart: on-failure
+    depends_on:
+      backend: { condition: service_healthy }
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        API_INTERNAL_URL: http://backend:8000
+    image: cvety-urala-frontend:latest
+    restart: unless-stopped
+    logging: *logging
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      API_INTERNAL_URL: http://backend:8000
+      SITE_INDEXING: ${SITE_INDEXING:-false}
+    ports:
+      - "${SITE_BIND:-127.0.0.1}:3000:3000"
+    depends_on:
+      backend: { condition: service_healthy }
+
+  # Резервное копирование БД: pg_dump раз в BACKUP_INTERVAL_HOURS, хранится BACKUP_KEEP копий
+  db-backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-flowers}
+      PGUSER: ${POSTGRES_USER:-flowers}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-flowers}
+      BACKUP_INTERVAL_HOURS: ${BACKUP_INTERVAL_HOURS:-24}
+      BACKUP_KEEP: ${BACKUP_KEEP:-7}
+      # фото товаров и страницы «О нас» — архивом рядом с копией базы (false — не копировать)
+      BACKUP_MEDIA: ${BACKUP_MEDIA:-true}
+      BACKUP_MEDIA_KEEP: ${BACKUP_MEDIA_KEEP:-3}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+      - media:/media:ro
+    entrypoint: ["/bin/sh", "/backup.sh", "--loop"]
+    depends_on:
+      db: { condition: service_healthy }
+
+  # Парсер ВК → Telegram-канал (папка vk-parser): следит за стеной сообщества и публикует новые посты.
+  # Включается строкой COMPOSE_PROFILES=parser в .env (+ VK_PARSER_TELEGRAM_BOT_TOKEN и
+  # VK_PARSER_TELEGRAM_CHAT_ID). Держите его включённым только в ОДНОМ месте (сервер или компьютер),
+  # иначе посты задублируются. Разовый сбор с меню: docker compose run --rm vk-parser menu
+  vk-parser:
+    build: ./vk-parser
+    image: cvety-urala-vk-parser:latest
+    profiles: ["parser"]
+    restart: unless-stopped
+    logging: *logging
+    security_opt: ["no-new-privileges:true"]
+    shm_size: "1gb"     # Chromium нужна общая память
+    mem_limit: 2g       # браузер не заберёт всю память сервера
+    environment:
+      TELEGRAM_BOT_TOKEN: ${VK_PARSER_TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${VK_PARSER_TELEGRAM_CHAT_ID:-}
+      VK_PARSER_VK_TOKEN: ${VK_PARSER_VK_TOKEN:-}   # сервисный ключ ВК → стена читается через официальный API (нужно на сервере)
+      VK_PARSER_URL: ${VK_PARSER_URL:-https://vk.ru/cvetyurala}
+      VK_PARSER_LIMIT: ${VK_PARSER_LIMIT:-10}
+      VK_PARSER_INTERVAL: ${VK_PARSER_INTERVAL:-60}
+      VK_PARSER_MAX_CATCHUP: ${VK_PARSER_MAX_CATCHUP:-1000}
+      VK_PARSER_DATA_DIR: ${VK_PARSER_DATA_DIR:-./vk-parser-data}
+    volumes:
+      - ${VK_PARSER_DATA_DIR:-./vk-parser-data}:/data          # архив постов и журнал отправок
+      - ./vk-parser/post_footer.txt:/app/post_footer.txt:ro    # подпись под постами — правится без пересборки
+
+volumes:
+  pgdata:
+  redisdata:
+  media:

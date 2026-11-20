@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/media/
+backend/staticfiles/
+backend/celerybeat-schedule*
+frontend/node_modules/
+frontend/.next/
+frontend/tsconfig.tsbuildinfo
+backups/
+shots/
+vk-parser-data/
+vk-parser/settings.json

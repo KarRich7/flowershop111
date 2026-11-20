@@ -1,0 +1,96 @@
+# Caddy — HTTPS и «входная дверь» сайта. Сертификат Let's Encrypt выпускается и продлевается сам.
+# Домен берётся из переменной SITE_DOMAIN (.env). Подробно — docs/DEPLOY.md
+{
+	email {$ACME_EMAIL}
+	servers {
+		# только HTTP/1.1 и HTTP/2 (обычный HTTPS по TCP). HTTP/3 (QUIC, по UDP) выключен: через часть VPN,
+		# антивирусов и мобильных сетей он «зависает», и сайт не открывается в Яндекс Браузере / Chrome
+		protocols h1 h2
+		# медленные «зависшие» соединения (атака Slowloris) обрываются
+		timeouts {
+			read_header 10s
+			read_body 120s
+			write 120s
+			idle 2m
+		}
+		max_header_size 32KB
+		# За Cloudflare / DDoS-Guard раскомментируйте и укажите их диапазоны IP — тогда в лимитах будет настоящий IP покупателя:
+		# trusted_proxies static 173.245.48.0/20 103.21.244.0/22 ...
+		# client_ip_headers CF-Connecting-IP X-Forwarded-For
+	}
+}
+
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# браузеры, запомнившие HTTP/3, забывают его и ходят по обычному HTTPS
+		Alt-Svc "clear"
+		-Server
+		-X-Powered-By
+	}
+
+	# фото больше 12 МБ и «бесконечные» тела запросов не принимаем
+	request_body {
+		max_size 12MB
+	}
+
+	route {
+		# служебные разделы Django и типичные пути сканеров уязвимостей — сразу 404, без нагрузки на сайт
+		@blocked path /django-admin* /api/docs* /api/schema* /static/admin* /.env* /.git* /wp-* /wordpress* /xmlrpc.php /phpmyadmin* /pma* /cgi-bin* *.php
+		respond @blocked 404
+
+		# фото товаров отдаём напрямую из хранилища (быстро, без Django); исполнять в них ничего нельзя
+		handle_path /media/* {
+			root * /srv/media
+			header {
+				Cache-Control "public, max-age=604800"
+				Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox"
+			}
+			file_server
+		}
+
+		handle /api/* {
+			reverse_proxy backend:8000 {
+				transport http {
+					dial_timeout 5s
+					response_header_timeout 60s
+				}
+			}
+		}
+
+		handle {
+			reverse_proxy frontend:3000 {
+				transport http {
+					dial_timeout 5s
+					response_header_timeout 60s
+				}
+			}
+		}
+	}
+
+	# журнал запросов; секретные токены из ссылок на заказ, оплату, корзину и вход покупателя
+	# заменяются на *** (тот же шаблон — в backend/config/log_masking.py), заголовки входа удаляются
+	log {
+		output stdout
+		format filter {
+			wrap console
+			fields {
+				request>uri regexp "(/(?:order|pay|carts|track|payments)/)[^/?#]+|([?&](?:token|order_token)=)[^&#]*" "${1}${2}***"
+				request>headers>Referer regexp "(/(?:order|pay|carts|track|payments)/)[^/?#]+|([?&](?:token|order_token)=)[^&#]*" "${1}${2}***"
+				# секретные заголовки и cookie входа в журнал не пишем вообще
+				request>headers>X-Customer-Token delete
+				request>headers>Authorization delete
+				request>headers>Cookie delete
+				resp_headers>Set-Cookie delete
+			}
+		}
+	}
+}

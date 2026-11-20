@@ -1,0 +1,1791 @@
+openapi: 3.0.3
+info:
+  title: Цветочный магазин — API
+  version: 0.1.0
+  description: Единый API сайта, Telegram-бота, ВК-бота и админ-панели (тестовая версия).
+paths:
+  /api/v1/about:
+    get:
+      operationId: v1_about_retrieve
+      summary: 'Страница «О нас»: текст и фото карусели'
+      tags:
+      - Магазин
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/login/start:
+    post:
+      operationId: v1_account_login_start_create
+      summary: 'Начать вход через бота {channel: telegram|vk, order_token?}'
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/login/status:
+    post:
+      operationId: v1_account_login_status_create
+      summary: 'Статус входа (POST): pending | confirmed (сессия — в cookie) | expired'
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/login/test-confirm:
+    post:
+      operationId: v1_account_login_test_confirm_create
+      description: |-
+        Только при CUSTOMER_LOGIN_TEST_MODE=true. Проходит тот же путь, что и настоящий бот: «открыть ссылку» →
+        кнопка «Войти на сайт» от имени тестового пользователя мессенджера.
+      summary: 'Тестовый режим: подтвердить вход без настоящего бота {token}'
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/logout:
+    post:
+      operationId: v1_account_logout_create
+      summary: Выйти на этом устройстве
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/logout-all:
+    post:
+      operationId: v1_account_logout_all_create
+      summary: Выйти на всех устройствах
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/me:
+    get:
+      operationId: v1_account_me_retrieve
+      summary: Профиль покупателя (GET) / изменить имя, телефон, e-mail (PATCH)
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_account_me_partial_update
+      summary: Профиль покупателя (GET) / изменить имя, телефон, e-mail (PATCH)
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/account/session/adopt:
+    post:
+      operationId: v1_account_session_adopt_create
+      summary: Перенести вход из старой версии сайта (заголовок X-Customer-Token)
+        в cookie
+      tags:
+      - Покупатель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/about:
+    get:
+      operationId: v1_admin_about_retrieve
+      summary: 'Страница «О нас»: заголовок, вступление, текст {title, lead, text}'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_admin_about_partial_update
+      summary: 'Страница «О нас»: заголовок, вступление, текст {title, lead, text}'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/about/photos:
+    post:
+      operationId: v1_admin_about_photos_create
+      summary: 'Добавить фото в карусель «О нас» (multipart: image, caption)'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/about/photos/{photo_id}:
+    patch:
+      operationId: v1_admin_about_photos_partial_update
+      summary: Изменить подпись {caption} или удалить фото карусели
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_about_photos_destroy
+      summary: Изменить подпись {caption} или удалить фото карусели
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/about/photos/order:
+    post:
+      operationId: v1_admin_about_photos_order_create
+      summary: Порядок фото карусели {ids:[...]}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/audit-log:
+    get:
+      operationId: v1_admin_audit_log_retrieve
+      summary: Журнал действий сотрудников
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/auth/adopt:
+    post:
+      operationId: v1_admin_auth_adopt_create
+      summary: Перенести вход из старой версии сайта (токен в заголовке Authorization)
+        в HttpOnly-cookie
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/auth/login:
+    post:
+      operationId: v1_admin_auth_login_create
+      summary: Вход сотрудника {username, password}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/auth/logout:
+    post:
+      operationId: v1_admin_auth_logout_create
+      summary: Выход (cookie удаляется, даже если вход уже истёк)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/auth/me:
+    get:
+      operationId: v1_admin_auth_me_retrieve
+      summary: Текущий сотрудник
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/auth/password:
+    post:
+      operationId: v1_admin_auth_password_create
+      summary: Сменить свой пароль {old_password, new_password} — все остальные сеансы
+        завершаются
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/categories:
+    get:
+      operationId: v1_admin_categories_retrieve
+      summary: Категории витрины ?kind=bouquet|flower; POST {kind, name}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_categories_create
+      summary: Категории витрины ?kind=bouquet|flower; POST {kind, name}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/categories/{category_id}:
+    patch:
+      operationId: v1_admin_categories_partial_update
+      summary: Переименовать {name} или удалить категорию ?move_to=<id> (товары переносятся
+        или остаются без категории)
+      parameters:
+      - in: path
+        name: category_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_categories_destroy
+      summary: Переименовать {name} или удалить категорию ?move_to=<id> (товары переносятся
+        или остаются без категории)
+      parameters:
+      - in: path
+        name: category_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/categories/{category_id}/products:
+    post:
+      operationId: v1_admin_categories_products_create
+      summary: Добавить товары в категорию {product_ids:[...]}
+      parameters:
+      - in: path
+        name: category_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/categories/order:
+    post:
+      operationId: v1_admin_categories_order_create
+      summary: Порядок категорий {kind, ids:[...]} — сверху вниз, как на витрине
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/couriers:
+    get:
+      operationId: v1_admin_couriers_retrieve
+      summary: Сотрудники-курьеры
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/customers:
+    get:
+      operationId: v1_admin_customers_retrieve
+      summary: Клиенты ?q=
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/customers/{customer_id}:
+    get:
+      operationId: v1_admin_customers_retrieve_2
+      summary: Клиент и его заказы
+      parameters:
+      - in: path
+        name: customer_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/dashboard:
+    get:
+      operationId: v1_admin_dashboard_retrieve
+      summary: Показатели для главной панели
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/deliveries:
+    get:
+      operationId: v1_admin_deliveries_retrieve
+      summary: Доставки на дату ?date=YYYY-MM-DD (курьер видит только свои)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/delivery-slots:
+    get:
+      operationId: v1_admin_delivery_slots_retrieve
+      summary: Интервалы доставки
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_delivery_slots_create
+      summary: Интервалы доставки
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/delivery-slots/{slot_id}:
+    patch:
+      operationId: v1_admin_delivery_slots_partial_update
+      summary: Изменить интервал {capacity, is_active} или удалить его
+      parameters:
+      - in: path
+        name: slot_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_delivery_slots_destroy
+      summary: Изменить интервал {capacity, is_active} или удалить его
+      parameters:
+      - in: path
+        name: slot_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/delivery-zones:
+    get:
+      operationId: v1_admin_delivery_zones_retrieve
+      summary: Районы доставки
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_delivery_zones_create
+      summary: Районы доставки
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/delivery-zones/{zone_id}:
+    patch:
+      operationId: v1_admin_delivery_zones_partial_update
+      summary: Изменить {name, price, free_from, is_active, polygons, color, sort_order}
+        или удалить район
+      parameters:
+      - in: path
+        name: zone_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_delivery_zones_destroy
+      summary: Изменить {name, price, free_from, is_active, polygons, color, sort_order}
+        или удалить район
+      parameters:
+      - in: path
+        name: zone_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/faq:
+    get:
+      operationId: v1_admin_faq_retrieve
+      summary: 'Частые вопросы на главной: GET; PUT {blocks:[{title, items:[{q, a}]}]}
+        — сохранить; DELETE — вернуть стандартные вопросы (собираются из настроек)'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: v1_admin_faq_update
+      summary: 'Частые вопросы на главной: GET; PUT {blocks:[{title, items:[{q, a}]}]}
+        — сохранить; DELETE — вернуть стандартные вопросы (собираются из настроек)'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_faq_destroy
+      summary: 'Частые вопросы на главной: GET; PUT {blocks:[{title, items:[{q, a}]}]}
+        — сохранить; DELETE — вернуть стандартные вопросы (собираются из настроек)'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/inventory:
+    get:
+      operationId: v1_admin_inventory_retrieve
+      summary: Складские позиции с остатками ?category=&q=&archived=1; POST — новая
+        позиция (владелец)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_inventory_create
+      summary: Складские позиции с остатками ?category=&q=&archived=1; POST — новая
+        позиция (владелец)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/inventory/{item_id}:
+    patch:
+      operationId: v1_admin_inventory_partial_update
+      summary: 'Складская позиция: изменить {name, category, unit, sku, purchase_price,
+        sale_price, min_stock, is_active} или удалить (позиция с историей переносится
+        в архив). Только владелец.'
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_inventory_destroy
+      summary: 'Складская позиция: изменить {name, category, unit, sku, purchase_price,
+        sale_price, min_stock, is_active} или удалить (позиция с историей переносится
+        в архив). Только владелец.'
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/inventory/adjust:
+    post:
+      operationId: v1_admin_inventory_adjust_create
+      summary: Корректировка {item_id, delta, reason}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/inventory/count:
+    post:
+      operationId: v1_admin_inventory_count_create
+      summary: Инвентаризация {counts:[{item_id, counted}], comment}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/inventory/demand:
+    get:
+      operationId: v1_admin_inventory_demand_retrieve
+      summary: Плановый спрос по будущим датам (предзаказы и сборка под заказ)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/inventory/movements:
+    get:
+      operationId: v1_admin_inventory_movements_retrieve
+      summary: История операций ?item_id=&type=&date_from=&date_to=&q=&limit=&export=csv
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/inventory/supply:
+    post:
+      operationId: v1_admin_inventory_supply_create
+      summary: Поставка {lines:[{item_id, quantity, unit_cost}], comment}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/inventory/write-off:
+    post:
+      operationId: v1_admin_inventory_write_off_create
+      summary: Списание {item_id, quantity, reason}
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/maps/check:
+    get:
+      operationId: v1_admin_maps_check_retrieve
+      summary: Проверить ключ Яндекс Карт и геокодер (запросы к Яндексу и OpenStreetMap,
+        до ~20 с)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/me/notify:
+    get:
+      operationId: v1_admin_me_notify_retrieve
+      summary: 'Мои уведомления о заказах: режим, смена, привязанные мессенджеры;
+        PATCH {notify_mode, on_shift, unlink}'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_admin_me_notify_partial_update
+      summary: 'Мои уведомления о заказах: режим, смена, привязанные мессенджеры;
+        PATCH {notify_mode, on_shift, unlink}'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/me/notify/link:
+    post:
+      operationId: v1_admin_me_notify_link_create
+      summary: Ссылки, чтобы привязать свой Telegram/ВК для уведомлений о заказах
+        (24 ч)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/order-photos/{photo_id}:
+    delete:
+      operationId: v1_admin_order_photos_destroy
+      summary: Удалить фото букета
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/orders:
+    get:
+      operationId: v1_admin_orders_retrieve
+      summary: 'Список заказов: ?status=&source=&date=&q=&scope=active'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}:
+    get:
+      operationId: v1_admin_orders_retrieve_2
+      summary: Карточка заказа
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/assign-courier:
+    post:
+      operationId: v1_admin_orders_assign_courier_create
+      summary: Назначить курьера {courier_id}
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/cancel:
+    post:
+      operationId: v1_admin_orders_cancel_create
+      summary: Отменить заказ {reason}
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/confirm:
+    post:
+      operationId: v1_admin_orders_confirm_create
+      summary: Подтвердить заказ (звонок / проверка флористом)
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/delivery:
+    patch:
+      operationId: v1_admin_orders_delivery_partial_update
+      summary: 'Адрес доставки {address, apartment, entrance, floor}: флорист вписывает
+        адрес, который назвал получатель'
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/notes:
+    post:
+      operationId: v1_admin_orders_notes_create
+      summary: Комментарий сотрудника {text}
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/photos:
+    post:
+      operationId: v1_admin_orders_photos_create
+      summary: 'Фото собранного букета (multipart: image). Первое фото уходит покупателю
+        в мессенджер'
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/refund:
+    post:
+      operationId: v1_admin_orders_refund_create
+      summary: Возврат оплаты
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/orders/{order_id}/transition:
+    post:
+      operationId: v1_admin_orders_transition_create
+      summary: Сменить статус {status, comment}
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/product-images/{image_id}:
+    delete:
+      operationId: v1_admin_product_images_destroy
+      summary: Удалить фото товара
+      parameters:
+      - in: path
+        name: image_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/products:
+    get:
+      operationId: v1_admin_products_retrieve
+      summary: Товары
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_products_create
+      summary: Товары
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/products/{product_id}:
+    get:
+      operationId: v1_admin_products_retrieve_2
+      summary: 'Карточка / изменение товара: цена, остаток {stock}, рецептура букета
+        {components}'
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_admin_products_partial_update
+      summary: 'Карточка / изменение товара: цена, остаток {stock}, рецептура букета
+        {components}'
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_products_destroy
+      summary: 'Карточка / изменение товара: цена, остаток {stock}, рецептура букета
+        {components}'
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/products/{product_id}/constructor-image:
+    post:
+      operationId: v1_admin_products_constructor_image_create
+      summary: 'Фото для конструктора: загрузить (multipart: image, remove_background=true|false)
+        или удалить. Для цветов фон убирается нейросетью, бутон выделяется автоматически.'
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_products_constructor_image_destroy
+      summary: 'Фото для конструктора: загрузить (multipart: image, remove_background=true|false)
+        или удалить. Для цветов фон убирается нейросетью, бутон выделяется автоматически.'
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/products/{product_id}/constructor-image/crop:
+    post:
+      operationId: v1_admin_products_constructor_image_crop_create
+      summary: Изменить кадр бутона для конструктора {x, y, w, h} — доли исходной
+        вырезки 0..1
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/products/{product_id}/images:
+    post:
+      operationId: v1_admin_products_images_create
+      summary: 'Загрузить фото товара (multipart: image)'
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/recipes:
+    get:
+      operationId: v1_admin_recipes_retrieve
+      summary: Рецептуры готовых букетов
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/recipes/{recipe_id}:
+    put:
+      operationId: v1_admin_recipes_update
+      summary: Изменить состав рецептуры {components:[{item_id, quantity}]}
+      parameters:
+      - in: path
+        name: recipe_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/recipes/{recipe_id}/assemble:
+    post:
+      operationId: v1_admin_recipes_assemble_create
+      summary: Собрать готовые букеты заранее {count}
+      parameters:
+      - in: path
+        name: recipe_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/security/check:
+    get:
+      operationId: v1_admin_security_check_retrieve
+      summary: Проверка безопасности установки (только владелец)
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/settings:
+    get:
+      operationId: v1_admin_settings_retrieve
+      summary: Настройки магазина
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_settings_create
+      summary: Настройки магазина
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_admin_settings_partial_update
+      summary: Настройки магазина
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/staff:
+    get:
+      operationId: v1_admin_staff_retrieve
+      summary: Сотрудники
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_admin_staff_create
+      summary: Сотрудники
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/staff/{user_id}:
+    patch:
+      operationId: v1_admin_staff_partial_update
+      summary: Изменить сотрудника {role, is_active, password, first_name, last_name,
+        phone} или удалить его учётную запись
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_admin_staff_destroy
+      summary: Изменить сотрудника {role, is_active, password, first_name, last_name,
+        phone} или удалить его учётную запись
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/staff/{user_id}/link:
+    post:
+      operationId: v1_admin_staff_link_create
+      summary: Одноразовые ссылки, чтобы сотрудник привязал свой Telegram/ВК для уведомлений
+        о заказах (24 ч)
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/store-sale:
+    post:
+      operationId: v1_admin_store_sale_create
+      summary: 'Быстрая продажа в магазине {lines:[{product_id, quantity}], payment:
+        cash|card, customer_phone}'
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/support/{notification_id}/reply:
+    post:
+      operationId: v1_admin_support_reply_create
+      summary: Ответить на обращение из бота {text}
+      parameters:
+      - in: path
+        name: notification_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Админ-панель
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/carts:
+    post:
+      operationId: v1_carts_create
+      summary: Создать корзину (канал определяется сервером)
+      tags:
+      - Корзина
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/carts/{token}:
+    get:
+      operationId: v1_carts_retrieve
+      summary: Корзина с актуальными ценами
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Корзина
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/carts/{token}/custom-bouquet:
+    post:
+      operationId: v1_carts_custom_bouquet_create
+      summary: Добавить индивидуальный букет (только сайт)
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Корзина
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/carts/{token}/items:
+    post:
+      operationId: v1_carts_items_create
+      summary: Добавить товар {product_id, quantity}
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Корзина
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/carts/{token}/items/{item_id}:
+    patch:
+      operationId: v1_carts_items_partial_update
+      summary: Изменить количество {quantity} или удалить позицию
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Корзина
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_carts_items_destroy
+      summary: Изменить количество {quantity} или удалить позицию
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Корзина
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/catalog/categories:
+    get:
+      operationId: v1_catalog_categories_retrieve
+      description: Категории в порядке, заданном в админке; пустые скрыты, «Другое»
+        — в конце.
+      summary: Категории готовых букетов
+      tags:
+      - Каталог
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/catalog/products:
+    get:
+      operationId: v1_catalog_products_retrieve
+      summary: 'Товары: ?type=bouquet|flower|greenery|card|addon&category=&featured=1&in_stock=1'
+      tags:
+      - Каталог
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/catalog/products/{slug}:
+    get:
+      operationId: v1_catalog_products_retrieve_2
+      summary: Карточка товара
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Каталог
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/checkout:
+    post:
+      operationId: v1_checkout_create
+      summary: Оформить заказ из корзины
+      tags:
+      - Заказы
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/constructor/options:
+    get:
+      operationId: v1_constructor_options_retrieve
+      summary: Варианты для конструктора букета (только сайт)
+      tags:
+      - Конструктор
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/constructor/quote:
+    post:
+      operationId: v1_constructor_quote_create
+      summary: Расчёт стоимости индивидуального букета на сервере
+      tags:
+      - Конструктор
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/delivery/geocode:
+    get:
+      operationId: v1_delivery_geocode_retrieve
+      summary: 'Найти адрес: ?q=улица, дом → адреса с координатами, зоной и подписью'
+      tags:
+      - Доставка
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/delivery/reverse:
+    get:
+      operationId: v1_delivery_reverse_retrieve
+      summary: 'Адрес по точке на карте: ?lat=&lon='
+      tags:
+      - Доставка
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/delivery/slots:
+    get:
+      operationId: v1_delivery_slots_retrieve
+      summary: 'Интервалы на дату: ?date=YYYY-MM-DD&fulfillment=delivery|pickup'
+      tags:
+      - Доставка
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/delivery/zones:
+    get:
+      operationId: v1_delivery_zones_retrieve
+      summary: Зоны доставки с границами на карте
+      tags:
+      - Доставка
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/faq:
+    get:
+      operationId: v1_faq_retrieve
+      summary: 'Частые вопросы: блоки с вопросами и ответами'
+      tags:
+      - Магазин
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/health:
+    get:
+      operationId: v1_health_retrieve
+      summary: Проверка работоспособности (БД и Redis)
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/orders/lookup:
+    post:
+      operationId: v1_orders_lookup_create
+      summary: Найти заказ по номеру и телефону {number, phone}
+      tags:
+      - Заказы
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/orders/track/{token}:
+    get:
+      operationId: v1_orders_track_retrieve
+      summary: Статус заказа по секретной ссылке
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Заказы
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/orders/track/{token}/pay:
+    post:
+      operationId: v1_orders_track_pay_create
+      summary: Получить ссылку на оплату (новая попытка)
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Заказы
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/payments/{token}:
+    get:
+      operationId: v1_payments_retrieve
+      summary: Данные платежа для страницы оплаты
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Платежи
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/payments/{token}/simulate:
+    post:
+      operationId: v1_payments_simulate_create
+      summary: 'Симулятор: succeed | fail | cancel | refund_succeed | refund_fail'
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - Платежи
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/payments/webhook/{provider}:
+    post:
+      operationId: v1_payments_webhook_create
+      summary: Webhook платёжного провайдера (подпись обязательна, идемпотентно)
+      parameters:
+      - in: path
+        name: provider
+        schema:
+          type: string
+        required: true
+      tags:
+      - Платежи
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/settings/public:
+    get:
+      operationId: v1_settings_public_retrieve
+      summary: Публичные настройки магазина
+      tags:
+      - Магазин
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/simulator/{channel}/inbox:
+    get:
+      operationId: v1_simulator_inbox_retrieve
+      summary: Уведомления, отправленные пользователю симулятора
+      parameters:
+      - in: path
+        name: channel
+        schema:
+          type: string
+        required: true
+      tags:
+      - Симулятор ботов
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/simulator/{channel}/message:
+    post:
+      operationId: v1_simulator_message_create
+      summary: Отправить сообщение/нажатие кнопки боту {user_id, text|payload|contact_phone|location}
+      parameters:
+      - in: path
+        name: channel
+        schema:
+          type: string
+        required: true
+      tags:
+      - Симулятор ботов
+      security:
+      - tokenAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer

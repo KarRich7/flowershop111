@@ -1,0 +1,21 @@
+{
+  "post": "[data-testid='post'][data-post-id], div.post[id^='post']",
+  "content": "[data-testid='post-content-container'], .wall_post_cont",
+  "text": "[data-testid='post_text'], .wall_post_text",
+  "text_inner": "[data-testid='showmoretext-in']",
+  "more": "[data-id='showMoreButton'], .wall_post_more",
+  "date": "[data-testid='post_date_block_preview'], .post_date, time[datetime]",
+  "photo": "[data-testid='media-grid'] a[href*='/photo'], [data-testid='primary-attachment-interactive-wrapper'][href*='/photo'], .page_post_sized_thumbs a[href*='photo'], a.page_post_thumb_wrap",
+  "video": "a[data-video], a[href^='/video'], a[href^='/clip']",
+  "exclude": "[data-testid='wall_comments_layout_root'], [data-testid='post-header'], .replies, .post_header",
+  "optional_banners": [
+    {
+      "name": "vk_login_suggestion",
+      "container": "[data-testid='modalbox'][role='dialog'][aria-modal='true']",
+      "heading": "h2",
+      "heading_pattern": "^(?:Войдите\\s+ВКонтакте,\\s+чтобы\\s+смотреть\\s+посты\\s+от|Sign\\s+up\\s+to\\s+view\\s+)",
+      "close": ":scope > [role='button']:has(svg.vkuiIcon--cancel_20)"
+    }
+  ],
+  "blockers": ["iframe[src*='captcha']", "[data-testid*='captcha']", "#captcha", "[data-testid='error-page']"]
+}
